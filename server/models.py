@@ -1,12 +1,20 @@
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy import Table, Column, Integer, String, Date, ForeignKey, func
-from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Date, ForeignKey, func
+from sqlalchemy.orm import DeclarativeBase, registry, Mapped, mapped_column, relationship
+from datetime import date
 import bcrypt
-from database.createDB import engine
 
-Base = declarative_base()
-Session = sessionmaker(bind=engine)
+metadata = MetaData()
+engine = create_engine('sqlite:///../database/loan_application.db')
+type_annotation_map = {
+    str: String, int: Integer, date: Date
+}
+
+mapper_registry = registry(type_annotation_map=type_annotation_map)
+class Base(DeclarativeBase):
+    metadata = metadata
+    type_annotation_map = type_annotation_map
+    registry = mapper_registry
 
 # joinning table for many-to-many relationship
 user_application_association = Table(
@@ -18,13 +26,13 @@ user_application_association = Table(
 class User(Base):
     __tablename__ = 'user'
 
-    user_id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String(50), unique=True, nullable=False)
-    _password_hash =Column(String(200), nullable= False)
-    email = Column(String(200), nullable=False)
-    fullname = Column(String(100), nullable=False)
-    role = Column(String(50), nullable= False)
-    department = Column(String(50), nullable=False)
+    user_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    username: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
+    _password_hash: Mapped[str] =mapped_column(String(200), nullable= False)
+    email: Mapped[str] = mapped_column(String(200), nullable=False)
+    fullname: Mapped[str] = mapped_column(String(100), nullable=False)
+    role: Mapped[str] = mapped_column(String(50), nullable= False)
+    department: Mapped[str] = mapped_column(String(50), nullable=False)
 
     applicatons = relationship('Application', secondary=user_application_association, back_populates='users')
 
@@ -46,16 +54,13 @@ class User(Base):
 class Applicaton(Base):
     __tablename__ = 'application'
 
-    application_id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(Integer, ForeignKey('user.user_id'))
-    create_date = Column(Date, nullable=False, default= func.now())
-    application_status = Column(String(50), nullable=False, default="SUBMITTED")
+    application_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    create_date = mapped_column(Date, nullable=False, default= func.now())
+    application_status: Mapped[str] = mapped_column(String(50), nullable=False, default="SUBMITTED")
 
     users = relationship('User', secondary=user_application_association, back_populates='applications')
 
     def __repr__(self):
         return f"Application(application_id={self.application_id}, create_date={self.create_date}, application_status={self.application_status})"
     
-
-def init_db():
-    Base.metadata.createAll(engine)
+Base.metadata.create_all(engine)
