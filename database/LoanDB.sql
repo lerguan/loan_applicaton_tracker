@@ -6,13 +6,12 @@ DROP TABLE IF EXISTS user;
 
 CREATE TABLE user (
     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username varchar(50) NOT NULL,
     password_hash varchar(200) NOT NULL,
     email varchar(200) NOT NULL,
     fullname varchar(100) NOT NULL,
     role varchar(50) NOT NULL,
     department varchart(50) NOT NULL,
-    CONSTRAINT UQ_username UNIQUE (username)
+    CONSTRAINT UQ_email UNIQUE (email)
 );
 
 CREATE TABLE application (

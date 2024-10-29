@@ -1,9 +1,11 @@
-from server.models import Session, Applicaton
+from server.models import engine, Applicaton
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 
 class ApplicationManager:
     def __init__(self):
-        self.session = Session()
+        self.session = Session(engine)
 
     def get(self, user_id):
-        application = self.session.query(Applicaton).filter()
+        with self.session as session:
+            ans = session.execute(text(""))

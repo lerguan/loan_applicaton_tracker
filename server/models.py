@@ -13,7 +13,6 @@ type_annotation_map = {
 mapper_registry = registry(type_annotation_map=type_annotation_map)
 class Base(DeclarativeBase):
     metadata = metadata
-    type_annotation_map = type_annotation_map
     registry = mapper_registry
 
 # joinning table for many-to-many relationship
@@ -27,7 +26,6 @@ class User(Base):
     __tablename__ = 'user'
 
     user_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    username: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     _password_hash: Mapped[str] =mapped_column(String(200), nullable= False)
     email: Mapped[str] = mapped_column(String(200), nullable=False)
     fullname: Mapped[str] = mapped_column(String(100), nullable=False)
@@ -49,7 +47,7 @@ class User(Base):
         return bcrypt.checkpw(self._password_hash, password.encode("utf-8"))
 
     def __repr__(self):
-        return f"User(user_id={self.user_id}, username={self.name}, fullname={self.fullname}), role={self.role}, department={self.department}"
+        return f"User(user_id={self.user_id}, email={self.email}, fullname={self.fullname}), role={self.role}, department={self.department}"
     
 class Applicaton(Base):
     __tablename__ = 'application'
