@@ -30,7 +30,7 @@ CREATE TABLE application (
     current_house_yrs int,
     risk_flag int,
     create_date date NOT NULL DEFAULT CURRENT_DATE,
-    application_status varchar(50) NOT NULL DEFAULT "SUBMITTED",
+    application_status varchar(50) NOT NULL DEFAULT "SUBMITTED"
 );
 
 CREATE TABLE user_application (
@@ -38,7 +38,7 @@ CREATE TABLE user_application (
     application_id int NOT NULL,
     CONSTRAINT PK_user_application PRIMARY KEY(user_id, application_id),
     CONSTRAINT FK_user_application_user FOREIGN KEY(user_id) REFERENCES user(user_id),
-    CONSTRAINT FK_user_application_application FOREIGN KEY(application_id) REFERENCES application(application_id),
+    CONSTRAINT FK_user_application_application FOREIGN KEY(application_id) REFERENCES application(application_id)
 );
 
 COMMIT TRANSACTION;
