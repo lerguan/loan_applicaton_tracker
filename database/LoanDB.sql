@@ -6,7 +6,7 @@ DROP TABLE IF EXISTS user;
 
 CREATE TABLE user (
     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    password_hash varchar(200) NOT NULL,
+    _password_hash varchar(200) NOT NULL,
     email varchar(200) NOT NULL,
     fullname varchar(100) NOT NULL,
     role varchar(50) NOT NULL,
