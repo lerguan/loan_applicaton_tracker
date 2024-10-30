@@ -11,15 +11,32 @@ class ApplicationManager:
 
 # get the applications that the user currently have 
     def get(self, user_id):
+        stmt = f'SELECT * FROM application a JOIN user_application ua ON a.application_id = ua.application JOIN user u ON ua.user_id = u.user_id WHERE user_id = {user_id}'
         try:
-            user = self.session.query(User).filter_by(user_id=user_id).first()
-            if not user:
-                return 'User not found!'
-
-            applications = user.applications
-            return applications  # This will return a list of Application objects
+            ans = self.session.execute(text(stmt))
+            if not ans:
+                return "User don't have any applications!"
+            results = ans.fetchall()
+            self.session.commit()
+            return results
         except Exception as e:
             return f'Error occurred: {str(e)}'
+        finally:
+            self.session.close()
+        
+# get the specific application
+    def get_by_app_id(self, application_id):
+        try:
+            application = self.session.query(Application).filter_by(application_id=application_id).first()
+            if not application:
+                return "Application not found!"
+            self.session.commit()
+            return application
+        except Exception as e:
+            return f'Error occurred: {str(e)}'
+        finally:
+            self.session.close()
+        
 
 # create a new application and associate it with the user
     def post(self, create_date=None, application_status="SUBMITTED", user_id=None):

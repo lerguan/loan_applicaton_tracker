@@ -32,7 +32,7 @@ class UserManager:
             self.session.add(user)
             self.session.commit()
 
-            return 'Welcome Back!'
+            return user
         
         return 'Invalid username and/or passoword!'
     

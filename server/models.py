@@ -24,12 +24,6 @@ class UserApplication(Base):
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey('user.user_id'), primary_key=True)
     application_id: Mapped[int] = mapped_column(Integer, ForeignKey('application.application_id'), primary_key=True)
 
-# user_application = Table(
-#     "user_application",
-#     Column("user_id", Integer, ForeignKey("user.user_id")),
-#     Column("application_id", Integer, ForeignKey("application.application_id")),
-# )
-
 class User(Base):
     __tablename__ = 'user'
 
