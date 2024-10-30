@@ -8,10 +8,12 @@ import os
 import sys
 
 fake = Faker()
-engine = create_engine('sqlite:///./loan_application.db')
+
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_dir = os.path.abspath(os.path.join(current_dir, ".."))
+db_dir = os.path.join(current_dir, "..", "loan_application.db")
+engine = create_engine(f'sqlite:///{db_dir}')
 sys.path.append(project_dir)
 
 from server.models import User, UserApplication
