@@ -1,6 +1,7 @@
 import sys
 from server.application_manager import ApplicationManager
 from server.user_manager import UserManager
+from tabulate import tabulate
 
 def main_menu():
     print("\nWelcome to the Loan Application Tracker!")
@@ -34,7 +35,9 @@ def main():
     user_manager = UserManager()
     app_manager = ApplicationManager()
     current_user = None
-
+    headers = ["ID", "Income", "Age", "Exp. Yrs", "Marital Status", "House Ownership", "Car Ownership", 
+           "Profession", "City", "State", "Job Yrs", "House Yrs", "Risk Flag", "Date", "Status"]
+    
     while True:
         choice = main_menu()
 
@@ -54,11 +57,11 @@ def main():
             email = input("Enter your email: ")
             password = input("Enter your password: ")
 
-            user = user_manager.login_user(email, password)
-            if result:
-                current_user = user
+            result = user_manager.login_user(email, password)
+            if type(result) is not str:
+                current_user = result
                 user_id = current_user.user_id
-                print(f'Welcome back, {current_user.fullname}')
+                print(f'Welcome back, {current_user.fullname}!')
                 
                 while True:
                     app_choice = application_menu()
@@ -73,10 +76,7 @@ def main():
                         # Search for Application
                         application_id = input("Enter Application ID to search for applications: ")
                         result = app_manager.get_by_app_id(application_id)
-                        if result:
-                            print(result)
-                        else:
-                            print('Application not found!')
+                        print(result)
                     
                     elif app_choice == '3':
                         # Update Application Status
@@ -99,7 +99,7 @@ def main():
                         user_id = current_user.user_id
                         result = app_manager.get(user_id)
                         if result:
-                            print(result)
+                            print(tabulate(result, headers, tablefmt='grid'))
                         else:
                             print('Application not found!')
 

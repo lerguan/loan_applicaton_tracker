@@ -11,7 +11,7 @@ class ApplicationManager:
 
 # get the applications that the user currently have 
     def get(self, user_id):
-        stmt = f'SELECT * FROM application a JOIN user_application ua ON a.application_id = ua.application JOIN user u ON ua.user_id = u.user_id WHERE user_id = {user_id}'
+        stmt = f'SELECT * FROM application WHERE application_id in (SELECT application_id FROM user_application WHERE user_id = {user_id})'
         try:
             ans = self.session.execute(text(stmt))
             if not ans:
@@ -26,12 +26,14 @@ class ApplicationManager:
         
 # get the specific application
     def get_by_app_id(self, application_id):
+        stmt = f'SELECT * FROM application WHERE application_id = {application_id}'
         try:
-            application = self.session.query(Application).filter_by(application_id=application_id).first()
-            if not application:
+            ans = self.session.execute(text(stmt))
+            if not ans:
                 return "Application not found!"
+            result = ans.fetchall()
             self.session.commit()
-            return application
+            return result
         except Exception as e:
             return f'Error occurred: {str(e)}'
         finally:
