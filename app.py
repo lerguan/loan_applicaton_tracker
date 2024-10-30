@@ -76,23 +76,30 @@ def main():
                         # Search for Application
                         application_id = input("Enter Application ID to search for applications: ")
                         result = app_manager.get_by_app_id(application_id)
-                        print(result)
+                        if not result:
+                            print("***Application not found!***")
+                        else:
+                            print(tabulate(result, headers, tablefmt='grid'))
                     
                     elif app_choice == '3':
                         # Update Application Status
-                        app_id = input("Enter Application ID to update: ")
+                        application_id = input("Enter Application ID to update: ")
                         new_status = input("Enter new status (Review, Approved, Issuing, Issued, Withdrawed, Expired): ") or 'Submitted'
-                        result = app_manager.patch_status(app_id, new_status)
-                        print(result)
+                        result = app_manager.patch_status(application_id, new_status)
+                        if not result:
+                            print()
+                        else:
+                            print(result)
 
                     elif app_choice == '4':
                         # Check Application Status
-                        app_id = input("Enter Application ID to check status: ")
-                        result = app_manager.get_status(app_id)
-                        if result:
-                            print(result)
+                        application_id = input("Enter Application ID to check status: ")
+                        result = app_manager.get_status(user_id, application_id)
+                        if not result:
+                            print('***Application not found OR not assigned!***')
                         else:
-                            print('Application not found!')
+                            print(f'The application (ID: {result[0][0]}) status: {result[0][1]}')
+
                     
                     elif app_choice == '5':
                         # Display Application

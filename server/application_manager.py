@@ -29,8 +29,6 @@ class ApplicationManager:
         stmt = f'SELECT * FROM application WHERE application_id = {application_id}'
         try:
             ans = self.session.execute(text(stmt))
-            if not ans:
-                return "Application not found!"
             result = ans.fetchall()
             self.session.commit()
             return result
@@ -68,14 +66,17 @@ class ApplicationManager:
         
 
 # Retrieve the status of a specific application by application_id
-    def get_status(self, application_id):
-
-        application = self.session.query(Application).filter_by(application_id=application_id).first()
-        
-        if not application:
-            return 'Application not found!'
-        
-        return application.application_status
+    def get_status(self, user_id, application_id):
+        stmt = f'SELECT a.application_id, application_status FROM application a JOIN user_application ua ON a.application_id = ua.application_id WHERE a.application_id = {application_id} AND user_id = {user_id}'
+        try:    
+            ans = self.session.execute(text(stmt))
+            result = ans.fetchall()
+            self.session.commit()
+            return result
+        except Exception as e:
+            return f'Error occurred: {str(e)}'
+        finally:
+            self.session.close()
     
 # Update the status of a specific application by application_id.
     def patch_status(self, application_id, new_status):
