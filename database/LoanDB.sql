@@ -29,7 +29,7 @@ CREATE TABLE application (
     current_house_yrs int,
     risk_flag int,
     create_date date NOT NULL DEFAULT CURRENT_DATE,
-    application_status varchar(50) NOT NULL DEFAULT "SUBMITTED"
+    application_status varchar(50) NOT NULL DEFAULT "Submitted"
 );
 
 CREATE TABLE user_application (

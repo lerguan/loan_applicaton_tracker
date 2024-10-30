@@ -3,7 +3,7 @@ from server.application_manager import ApplicationManager
 from server.user_manager import UserManager
 
 def main_menu():
-    print("\nWelcome to the Loan Application CLI!")
+    print("\nWelcome to the Loan Application Tracker!")
     print("1. Register")
     print("2. Login")
     print("3. Exit")
@@ -22,11 +22,12 @@ def application_menu():
     choice = input("Please select an option: ")
     return choice
 
-def get_application_details():
-    user_id = input("Enter User ID: ")
+def add_new_application():
+    # user_id = input("Confirm User ID: ")
+    application_id = input("Enter application ID: ")
     create_date = input("Enter Creation Date (YYYY-MM-DD) [optional]: ")
-    status = input("Enter Application Status [optional]: ") or "SUBMITTED"
-    return user_id, create_date, status
+    status = input("Enter Application Status (Review, Approved, Issuing, Issued, Withdrawed, Expired) [optional]: ") or "Submitted"
+    return application_id, create_date, status
 
 def main():
     user_manager = UserManager()
@@ -54,7 +55,7 @@ def main():
 
             result = user_manager.login_user(email, password)
             if "Welcome" in result:
-                current_user = email  # Store logged in user's email
+                current_user = email
                 print(result)
                 
                 while True:
@@ -62,20 +63,24 @@ def main():
                     
                     if app_choice == '1':
                         # Add New Application
-                        user_id, create_date, status = get_application_details()
-                        result = app_manager.post(create_date=create_date, user_id=user_id, application_status=status)
+                        application_id, create_date, status = add_new_application()
+                        result = app_manager.post(create_date=create_date, application_id=application_id, application_status=status)
                         print(result)
                     
                     elif app_choice == '2':
                         # Search for Application
-                        user_id = input("Enter User ID to search for applications: ")
-                        result = app_manager.get(user_id)
-                        print(result)
+                        user_id = user_manager.get_user_id()
+                        application_id = input("Enter Application ID to search for applications: ")
+                        result = app_manager.get(user_id, application_id)
+                        if result:
+                            print(result)
+                        else:
+                            print('Application not found!')
                     
                     elif app_choice == '3':
                         # Update Application Status
                         app_id = input("Enter Application ID to update: ")
-                        new_status = input("Enter new status: ")
+                        new_status = input("Enter new status (Review, Approved, Issuing, Issued, Withdrawed, Expired): ") or 'Submitted'
                         result = app_manager.patch_status(app_id, new_status)
                         print(result)
 
@@ -83,7 +88,10 @@ def main():
                         # Check Application Status
                         app_id = input("Enter Application ID to check status: ")
                         result = app_manager.get_status(app_id)
-                        print(result)
+                        if result:
+                            print(result)
+                        else:
+                            print('Application not found!')
 
                     elif app_choice == '5':
                         # Logout
