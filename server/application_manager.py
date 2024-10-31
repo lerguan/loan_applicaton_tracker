@@ -14,8 +14,6 @@ class ApplicationManager:
         stmt = f'SELECT * FROM application WHERE application_id in (SELECT application_id FROM user_application WHERE user_id = {user_id})'
         try:
             ans = self.session.execute(text(stmt))
-            if not ans:
-                return "User don't have any applications!"
             results = ans.fetchall()
             self.session.commit()
             return results
@@ -39,30 +37,17 @@ class ApplicationManager:
         
 
 # create a new application and associate it with the user
-    def post(self, create_date=None, application_status="SUBMITTED", user_id=None):
-        new_application = Application(create_date=create_date, application_status=application_status)
-        
+    def post(self, user_id, application_id):
+        new_application_assignment = UserApplication(user_id=user_id, application_id=application_id)
         try:
-            self.session.add(new_application)
+            self.session.add(new_application_assignment)
             self.session.commit()
-
-            # If user_id is provided, create the association
-            if user_id:
-                user = self.session.query(User).filter_by(user_id=user_id).first()
-                if user:
-                    new_application.users.append(user)  # Associate the application with the user
-                    self.session.commit()  # Commit changes for the user association
-                else:
-                    self.session.rollback()
-                    return 'User not found!'
-
-            return f'Application created successfully with ID {new_application.application_id}'
         except IntegrityError:
             self.session.rollback()
             return 'Error: Could not create application.'
         except Exception as e:
             self.session.rollback()
-            return f'Error occurred: {str(e)}'
+            return f'Application already assigned.'
         
 
 # Retrieve the status of a specific application by application_id
@@ -80,36 +65,30 @@ class ApplicationManager:
     
 # Update the status of a specific application by application_id.
     def patch_status(self, application_id, new_status):
-
-        application = self.session.query(Application).filter_by(application_id=application_id).first()
-        
-        if not application:
-            return 'Application not found!'
-
+        stmt = f'UPDATE application SET application_status = {new_status} WHERE application_id = {application_id}'
         try:
-            application.application_status = new_status  # Update the status
-            self.session.commit()  # Commit the changes
+            self.session.execute(text(stmt))
+            self.session.commit()
             return f'Application status updated to {new_status}'
         except Exception as e:
             self.session.rollback()
             return f'Error occurred: {str(e)}'
+        finally:
+            self.session.close()
 
-    def delete(self, application_id):
-        """
-        Delete a specific application by application_id.
-        """
-        application = self.session.query(Application).filter_by(application_id=application_id).first()
+    # def delete(self, application_id):
+    #     """
+    #     Delete a specific application by application_id.
+    #     """
+    #     application = self.session.query(Application).filter_by(application_id=application_id).first()
 
-        if not application:
-            return 'Application not found!'
+    #     if not application:
+    #         return 'Application not found!'
 
-        try:
-            self.session.delete(application)  # Delete the application
-            self.session.commit()  # Commit the deletion
-            return 'Application deleted successfully.'
-        except Exception as e:
-            self.session.rollback()
-            return f'Error occurred: {str(e)}'
-
-    # def get_unssigned_application(self):
-    #     pass
+    #     try:
+    #         self.session.delete(application)  # Delete the application
+    #         self.session.commit()  # Commit the deletion
+    #         return 'Application deleted successfully.'
+    #     except Exception as e:
+    #         self.session.rollback()
+    #         return f'Error occurred: {str(e)}'

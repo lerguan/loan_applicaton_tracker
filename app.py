@@ -14,22 +14,20 @@ def main_menu():
 
 def application_menu():
     print("\nApplication Management Menu:")
-    print("1. Add New Application")
+    print("1. Assign New Application to Me")
     print("2. Search for Application")
     print("3. Update Application Status")
     print("4. Check Application Status")
-    print("5. Display Applications")
+    print("5. Display Applications Assigned to Me")
     print("6. Logout")
     
     choice = input("Please select an option: ")
     return choice
 
 def add_new_application():
-    # user_id = input("Confirm User ID: ")
     application_id = input("Enter application ID: ")
-    create_date = input("Enter Creation Date (YYYY-MM-DD) [optional]: ")
     status = input("Enter Application Status (Review, Approved, Issuing, Issued, Withdrawed, Expired) [optional]: ") or "Submitted"
-    return application_id, create_date, status
+    return application_id, status
 
 def main():
     user_manager = UserManager()
@@ -68,27 +66,38 @@ def main():
                     
                     if app_choice == '1':
                         # Add New Application
-                        application_id, create_date, status = add_new_application()
-                        result = app_manager.post(user_id=user_id, create_date=create_date, application_id=application_id, application_status=status)
-                        print(result)
+                        application_id = input("Enter application ID to be assigned: ")
+                        result = app_manager.post(user_id, application_id)
+                        if result:
+                            print('\n')
+                            print(f'***Application already assigned OR not found***')
+                        else:
+                            print('\n')
+                            print(f'***Application (ID: {application_id}) assigned sucessfully!***')
                     
                     elif app_choice == '2':
                         # Search for Application
                         application_id = input("Enter Application ID to search for applications: ")
                         result = app_manager.get_by_app_id(application_id)
                         if not result:
+                            print('\n')
                             print("***Application not found!***")
                         else:
+                            print('\n')
                             print(tabulate(result, headers, tablefmt='grid'))
                     
                     elif app_choice == '3':
                         # Update Application Status
                         application_id = input("Enter Application ID to update: ")
-                        new_status = input("Enter new status (Review, Approved, Issuing, Issued, Withdrawed, Expired): ") or 'Submitted'
-                        result = app_manager.patch_status(application_id, new_status)
+                        result = app_manager.get_status(user_id, application_id)
                         if not result:
-                            print()
+                            print('\n')
+                            print('***Application not found OR not assigned!***')
                         else:
+                            print('\n')
+                            print(f'The application (ID: {result[0][0]}) current status: {result[0][1]}')
+                            new_status = input("Enter new status (Review, Approved, Issuing, Issued, Withdrawed, Expired): ") or 'Submitted'
+                            result = app_manager.patch_status(application_id, new_status)
                             print(result)
 
                     elif app_choice == '4':
@@ -96,8 +105,10 @@ def main():
                         application_id = input("Enter Application ID to check status: ")
                         result = app_manager.get_status(user_id, application_id)
                         if not result:
+                            print('\n')
                             print('***Application not found OR not assigned!***')
                         else:
+                            print('\n')
                             print(f'The application (ID: {result[0][0]}) status: {result[0][1]}')
 
                     
@@ -106,8 +117,10 @@ def main():
                         user_id = current_user.user_id
                         result = app_manager.get(user_id)
                         if result:
+                            print('\n')
                             print(tabulate(result, headers, tablefmt='grid'))
                         else:
+                            print('\n')
                             print('Application not found!')
 
                     elif app_choice == '6':
