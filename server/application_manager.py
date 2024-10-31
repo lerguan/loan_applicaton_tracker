@@ -5,6 +5,10 @@ from sqlalchemy.orm import sessionmaker
 
 Session = sessionmaker(bind=engine)
 
+class ApplicationNotFoundException(Exception):
+    def __init__(self, id):
+        super().__init__(f'Application with ID {id} not found.')
+
 class ApplicationManager:
     def __init__(self):
         self.session = Session()
@@ -16,6 +20,8 @@ class ApplicationManager:
             ans = self.session.execute(text(stmt))
             results = ans.fetchall()
             self.session.commit()
+            if not results:
+                raise ApplicationNotFoundException(user_id)
             return results
         except Exception as e:
             return f'Error occurred: {str(e)}'
@@ -29,6 +35,8 @@ class ApplicationManager:
             ans = self.session.execute(text(stmt))
             result = ans.fetchall()
             self.session.commit()
+            if not result:
+                raise ApplicationNotFoundException(application_id)
             return result
         except Exception as e:
             return f'Error occurred: {str(e)}'
@@ -47,7 +55,7 @@ class ApplicationManager:
             return 'Error: Could not create application.'
         except Exception as e:
             self.session.rollback()
-            return f'Application already assigned.'
+            return f'Error occurred: {str(e)}'
         
 
 # Retrieve the status of a specific application by application_id
@@ -57,6 +65,8 @@ class ApplicationManager:
             ans = self.session.execute(text(stmt))
             result = ans.fetchall()
             self.session.commit()
+            if not result:
+                raise ApplicationNotFoundException(application_id)
             return result
         except Exception as e:
             return f'Error occurred: {str(e)}'

@@ -4,6 +4,10 @@ from sqlalchemy.orm import sessionmaker
 
 Session = sessionmaker(bind=engine)
 
+class UserInformationException(Exception):
+    def __init__(self, email):
+        super().__init__(f'User {email} information not applied')
+
 class UserManager:
     def __init__(self):
         self.session = Session()
@@ -22,7 +26,7 @@ class UserManager:
             return f'User {email} registered!'
         except IntegrityError:
             self.session.rollback()
-            return 'error: 422 unprocessable entity'
+            raise UserInformationException(email)
 
     
     def login_user(self, email, password):
@@ -53,6 +57,6 @@ class UserManager:
             return f'User {email} updated successfully!'
         except IntegrityError:
             self.session.rollback()
-            return 'Error: Could not update user information.'
+            raise UserInformationException(email)
 
 
