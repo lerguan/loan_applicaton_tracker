@@ -2,6 +2,7 @@ import sys
 from server.application_manager import ApplicationManager
 from server.user_manager import UserManager
 from tabulate import tabulate
+import re
 
 def main_menu():
     print("\nWelcome to the Loan Application Tracker!")
@@ -41,7 +42,13 @@ def main():
 
         if choice == '1':
             # Register
-            email = input("Enter your email: ")
+            while True:
+                email = input("Enter your email: ")
+                match = re.match("^[a-zA-Z0-9._%±]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$", email)
+                if match:
+                    break
+                else:
+                    print("Please enter valid email")
             fullname = input("Enter your full name: ")
             password = input("Enter your password: ")
             role = input("Enter your role: ")
