@@ -27,7 +27,13 @@ def application_menu():
 
 def add_new_application():
     application_id = input("Enter application ID: ")
-    status = input("Enter Application Status (Review, Approved, Issuing, Issued, Withdrawed, Expired) [optional]: ") or "Submitted"
+    options = ['review', 'approved', 'issuing', 'issued', 'withdrawed', 'expired', 'submitted']
+    while True:
+        status = input("Enter Application Status (Review, Approved, Issuing, Issued, Withdrawed, Expired) [optional]: ") or "Submitted"
+        if status.lower() in options:
+            break
+        else:
+            print("***Please enter valid status.***")
     return application_id, status
 
 def main():
@@ -103,7 +109,13 @@ def main():
                         else:
                             print('\n')
                             print(f'The application (ID: {result[0][0]}) current status: {result[0][1]}')
-                            new_status = input("Enter new status (Review, Approved, Issuing, Issued, Withdrawed, Expired): ") or 'Submitted'
+                            options = ['review', 'approved', 'issuing', 'issued', 'withdrawed', 'expired', 'submitted']
+                            while True:
+                                new_status = input("Enter new status (Review, Approved, Issuing, Issued, Withdrawed, Expired): ") or 'Submitted'
+                                if new_status.lower() in options:
+                                    break
+                                else:
+                                    print("***Please enter valid status.***")
                             result = app_manager.patch_status(application_id, new_status)
                             print(result)
 
