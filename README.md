@@ -1,4 +1,4 @@
-# Loan Applicaton Progress Tracker
+# Loan Application Progress Tracker
 
 ## Introduction
 
